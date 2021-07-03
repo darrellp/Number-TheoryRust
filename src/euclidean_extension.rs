@@ -67,6 +67,22 @@ where
     }
 }
 
+/// Returns a GCD of two numbers and the linear coefficients to produce that GCD from the two numbers
+///
+/// # Arguments
+///
+/// * `val1` - First number
+/// * `val2` - Second number
+///
+/// # Returns
+/// * Tuple with first value GCD, second value is coeff for val1 , third value is coeff for val2
+/// # Examples
+///
+/// ```
+/// let (gcd, coeff1, coeff2) = number_theory::euclidean_extension::calc_euclidean_ext(97, 18);
+/// assert_eq!(gcd, 1);
+/// assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
+/// ```
 pub fn calc_euclidean_ext<T>(val1: T, val2: T) -> (T, T, T)
 where
     T: Numeric,
