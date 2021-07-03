@@ -1,11 +1,49 @@
-struct ExtMatrix {
-    first_row: usize,
-    mtx: [[i64; 3]; 3],
+use num::FromPrimitive;
+use std::{
+    ops::{Add, Div, Mul, Rem, Sub},
+    usize,
+};
+
+pub trait Numeric:
+    Add<Output = Self>
+    + Div<Output = Self>
+    + Mul<Output = Self>
+    + Sub<Output = Self>
+    + Rem<Output = Self>
+    + Copy
+    + PartialEq
+    + FromPrimitive
+{
 }
 
-impl ExtMatrix {
-    fn new(val1: i64, val2: i64) -> ExtMatrix {
-        let mtx = [[val1, 1, 0], [val2, 0, 1], [0, 0, 0]];
+impl<T> Numeric for T where
+    T: Add<Output = T>
+        + Div<Output = T>
+        + Mul<Output = T>
+        + Sub<Output = T>
+        + Rem<Output = T>
+        + Copy
+        + PartialEq
+        + FromPrimitive
+{
+}
+struct ExtMatrix<T>
+where
+    T: Numeric,
+{
+    first_row: usize,
+    mtx: [[T; 3]; 3],
+}
+
+impl<T> ExtMatrix<T>
+where
+    T: Numeric,
+{
+    fn new(val1: T, val2: T) -> ExtMatrix<T> {
+        let zero: T = FromPrimitive::from_i32(0).unwrap();
+        let one: T = FromPrimitive::from_i32(1).unwrap();
+
+        let mtx = [[val1, one, zero], [val2, zero, one], [zero, zero, zero]];
         ExtMatrix { first_row: 0, mtx }
     }
 
@@ -20,16 +58,19 @@ impl ExtMatrix {
     }
 
     fn finished(&self) -> bool {
-        self.mtx[(self.first_row + 1) % 3][0] == 0
+        self.mtx[(self.first_row + 1) % 3][0] == FromPrimitive::from_usize(0).unwrap()
     }
 
-    fn result(&self) -> (i64, i64, i64) {
+    fn result(&self) -> (T, T, T) {
         let row = &self.mtx[self.first_row];
         (row[0], row[1], row[2])
     }
 }
 
-pub fn calc_euclidean_ext(val1: i64, val2: i64) -> (i64, i64, i64) {
+pub fn calc_euclidean_ext<T>(val1: T, val2: T) -> (T, T, T)
+where
+    T: Numeric,
+{
     let mut mtx = ExtMatrix::new(val1, val2);
     while !mtx.finished() {
         mtx.step();
