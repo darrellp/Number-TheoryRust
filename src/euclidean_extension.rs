@@ -72,7 +72,7 @@ where
 }
 
 /**
-Returns a function which produces coefficients to solve ax + by = c if any exist
+Returns a function which produces coefficients to solve ax + by = c if any exist - also GCD(a, b)
 
 # Arguments
 
@@ -86,19 +86,26 @@ Returns a function which produces coefficients to solve ax + by = c if any exist
 # Examples
 
 ```
-let fnSolve = number_theory::euclidean_extension::solve_diophantine(7, 13, 5).unwrap();
-let (x, y) = fnSolve(0);
-assert_eq!(7 * x + 13 * y, 5);
+    let (opt, gcd) = number_theory::euclidean_extension::solve_diophantine(7, 13, 5);
+    assert_eq!(gcd, 1);
+    let fn_solve = opt.unwrap();
+    let (x, y) = fn_solve(0);
+    assert_eq!(7 * x + 13 * y, 5);
+    let (x1, y1) = fn_solve(1);
+    assert_ne!(x, x1);
+    assert_eq!(7*x1 + 13 * y1, 5);
+
+
 ```
 */
-pub fn solve_diophantine<T>(a: T, b: T, c: T) -> Option<impl Fn(i32) -> (T, T)>
+pub fn solve_diophantine<T>(a: T, b: T, c: T) -> (Option<impl Fn(i32) -> (T, T)>, T)
 where
     T: Numeric,
 {
     let zero = FromPrimitive::from_usize(0).unwrap();
     let (gcd, c1, c2) = calc_euclidean_ext(a, b);
     if c % gcd != zero {
-        return None;
+        return (None, gcd);
     }
     let cnst1 = c * c1 / gcd;
     let cnst2 = c * c2 / gcd;
@@ -119,5 +126,7 @@ where
         (cf1 * i_t + cnst1, cf2 * i_t + cnst2)
     };
 
-    Some(result)
+    (Some(result), gcd)
 }
+
+//pub fn SolveLinearCongruence<T>(T a, T b, T mod)
