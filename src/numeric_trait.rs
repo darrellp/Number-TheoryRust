@@ -1,5 +1,5 @@
-use num::FromPrimitive;
-use std::ops::{Add, Div, Mul, Rem, Sub};
+use num::{FromPrimitive, Signed};
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 pub trait Numeric:
     Add<Output = Self>
@@ -7,7 +7,11 @@ pub trait Numeric:
     + Mul<Output = Self>
     + Sub<Output = Self>
     + Rem<Output = Self>
+    + Neg<Output = Self>
+    + Ord
+    + Signed
     + Copy
+    + Clone
     + PartialEq
     + FromPrimitive
 {
@@ -19,7 +23,11 @@ impl<T> Numeric for T where
         + Mul<Output = T>
         + Sub<Output = T>
         + Rem<Output = T>
+        + Neg<Output = T>
+        + Ord
+        + Signed
         + Copy
+        + Clone
         + PartialEq
         + FromPrimitive
 {

@@ -1,5 +1,5 @@
 use crate::numeric_trait::Numeric;
-use num::FromPrimitive;
+use num::{abs, FromPrimitive};
 
 struct ExtMatrix<T>
 where
@@ -41,22 +41,25 @@ where
     }
 }
 
-/// Returns a GCD of two numbers and the linear coefficients to produce that GCD from the two numbers
-///
-/// # Arguments
-///
-/// * `val1` - First number
-/// * `val2` - Second number
-///
-/// # Returns
-/// * Tuple with first value GCD, second value is coeff for val1 , third value is coeff for val2
-/// # Examples
-///
-/// ```
-/// let (gcd, coeff1, coeff2) = number_theory::euclidean_extension::calc_euclidean_ext(97, 18);
-/// assert_eq!(gcd, 1);
-/// assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
-/// ```
+/**
+Returns a GCD of two numbers and the linear coefficients to produce that GCD from the two numbers
+
+# Arguments
+
+* `val1` - First number
+* `val2` - Second number
+
+# Returns
+* Tuple whose first value is GCD, second value is coeff for val1 , third value is coeff for val2
+
+# Examples
+
+```
+let (gcd, coeff1, coeff2) = number_theory::euclidean_extension::calc_euclidean_ext(97, 18);
+assert_eq!(gcd, 1);
+assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
+```
+*/
 pub fn calc_euclidean_ext<T>(val1: T, val2: T) -> (T, T, T)
 where
     T: Numeric,
@@ -66,4 +69,55 @@ where
         mtx.step();
     }
     mtx.result()
+}
+
+/**
+Returns a function which produces coefficients to solve ax + by = c if any exist
+
+# Arguments
+
+* `a`, `b`, `c` - Coefficients in linear equation ax + by = c
+
+# Returns
+* Option with a closure which takes an i32 and each different value produces different x, y
+  to solve the above equation.  The function provides a "small" pair for i = 0.  If there
+  is no solution then Option.None is returned.
+
+# Examples
+
+```
+let fnSolve = number_theory::euclidean_extension::solve_diophantine(7, 13, 5).unwrap();
+let (x, y) = fnSolve(0);
+assert_eq!(7 * x + 13 * y, 5);
+```
+*/
+pub fn solve_diophantine<T>(a: T, b: T, c: T) -> Option<impl Fn(i32) -> (T, T)>
+where
+    T: Numeric,
+{
+    let zero = FromPrimitive::from_usize(0).unwrap();
+    let (gcd, c1, c2) = calc_euclidean_ext(a, b);
+    if c % gcd != zero {
+        return None;
+    }
+    let cnst1 = c * c1 / gcd;
+    let cnst2 = c * c2 / gcd;
+    let cf1 = b / gcd;
+    let cf2 = -a / gcd;
+
+    let q = if abs(cnst1) > abs(cnst2) {
+        cnst1 / cf1
+    } else {
+        cnst2 / cf2
+    };
+
+    let cnst1 = cnst1 - q * cf1;
+    let cnst2 = cnst2 - q * cf2;
+
+    let result = move |i: i32| {
+        let i_t = FromPrimitive::from_i32(i).unwrap();
+        (cf1 * i_t + cnst1, cf2 * i_t + cnst2)
+    };
+
+    Some(result)
 }
