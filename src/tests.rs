@@ -1,5 +1,8 @@
 use crate::euclidean_extension::calc_euclidean_ext;
 use crate::euclidean_extension::solve_diophantine;
+use crate::euclidean_extension::solve_linear_congruence;
+//use crate::euclidean_extension::solve_linear_congruence;
+//use num::BigInt;
 
 // Euclidean Extension
 #[test]
@@ -21,4 +24,20 @@ fn solve_diophantine_test() {
     let fn_solve = opt.unwrap();
     let (x, y) = fn_solve(0);
     assert_eq!(7 * x + 13 * y, 5);
+}
+
+#[test]
+fn solve_linear_congruence_test() {
+    // let big_a = BigInt::parse_bytes(b"6123123", 10).unwrap();
+    // let big_b = BigInt::parse_bytes(b"6123123123", 10).unwrap();
+    // let big_mod = BigInt::parse_bytes(b"9123123123123", 10).unwrap();
+    let big_a = 123;
+    let big_b = 9123;
+    let big_mod = 321123;
+
+    let solns = solve_linear_congruence(big_a, big_b, big_mod).unwrap();
+    assert_eq!(solns.len(), 3);
+    for isoln in solns {
+        assert_eq!(big_b, big_a * isoln % big_mod);
+    }
 }

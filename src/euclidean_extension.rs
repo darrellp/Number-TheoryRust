@@ -129,4 +129,58 @@ where
     (Some(result), gcd)
 }
 
-//pub fn SolveLinearCongruence<T>(T a, T b, T mod)
+/**
+Returns solutions to ax = b (mod modulo)
+
+# Arguments
+
+* `a`, `b`, `modulo` - Coefficients in ax = b (mod modulo)
+
+# Returns
+* Optional vector of solutions mod modulo of length GCD(a, b)
+
+# Examples
+
+```
+    let big_a = 123;
+    let big_b = 9123;
+    let big_mod = 321123;
+
+    let solns = number_theory::euclidean_extension::solve_linear_congruence(big_a, big_b, big_mod).unwrap();
+    assert_eq!(solns.len(), 3);
+    for isoln in solns {
+        assert_eq!(big_b, big_a * isoln % big_mod);
+    }
+```
+*/
+pub fn solve_linear_congruence<T>(a: T, b: T, modulo: T) -> Option<Vec<T>>
+where
+    T: Numeric,
+{
+    let zero = FromPrimitive::from_usize(0).unwrap();
+    let one = FromPrimitive::from_usize(1).unwrap();
+
+    let (opt, gcd) = solve_diophantine(a, modulo, b);
+    let func_solns = match opt {
+        None => return None,
+        Some(val) => val,
+    };
+    let mut ret = Vec::new();
+    let gcd_int_opt = num::ToPrimitive::to_i32(&gcd);
+    if gcd_int_opt == None {
+        return None;
+    }
+    let gcd_int = gcd_int_opt.unwrap();
+    for i in 0..gcd_int {
+        let (sln, _) = func_solns(i);
+        let sln = if sln > modulo {
+            sln - (sln / modulo) * modulo
+        } else if sln < zero {
+            sln + ((modulo - one - sln) / modulo) * modulo
+        } else {
+            sln
+        };
+        ret.push(sln);
+    }
+    Some(ret)
+}

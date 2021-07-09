@@ -1,4 +1,4 @@
-use num::{FromPrimitive, Signed};
+use num::{FromPrimitive, Signed, ToPrimitive};
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 pub trait Numeric:
@@ -14,6 +14,7 @@ pub trait Numeric:
     + Clone
     + PartialEq
     + FromPrimitive
+    + ToPrimitive
 {
 }
 
@@ -30,5 +31,6 @@ impl<T> Numeric for T where
         + Clone
         + PartialEq
         + FromPrimitive
+        + ToPrimitive
 {
 }
