@@ -42,6 +42,65 @@ where
 }
 
 /**
+Returns a GCD of two numbers
+
+# Arguments
+
+* `val1` - First number
+* `val2` - Second number
+
+# Returns
+* GCD
+
+# Examples
+
+```
+let gcd = number_theory::euclidean_extension::gcd(97, 18);
+assert_eq!(gcd, 1);
+```
+*/
+pub fn gcd<T>(val1: T, val2: T) -> T
+where
+    T: Numeric,
+{
+    let zero: T = FromPrimitive::from_i32(0).unwrap();
+    let mut val1 = abs(val1);
+    let mut val2 = abs(val2);
+
+    while val2 != zero {
+        let r = val1 % val2;
+        val1 = val2;
+        val2 = r;
+    }
+    val1
+}
+
+/**
+Returns a LCM of two numbers
+
+# Arguments
+
+* `val1` - First number
+* `val2` - Second number
+
+# Returns
+* LCM
+
+# Examples
+
+```
+let lcm = number_theory::euclidean_extension::lcm(4, 6);
+assert_eq!(lcm, 12);
+```
+*/
+pub fn lcm<T>(val1: T, val2: T) -> T
+where
+    T: Numeric
+{
+    val1 * val2 / gcd(val1, val2)
+}
+
+/**
 Returns a GCD of two numbers and the linear coefficients to produce that GCD from the two numbers
 
 # Arguments
@@ -183,4 +242,31 @@ where
         ret.push(sln);
     }
     Some(ret)
+}
+
+/**
+Returns a^-1 (mod modulo)
+
+# Arguments
+
+* `a`, `modulo` - Coefficients in a^-1 (mod modulo)
+
+# Returns
+* Some(Inverse of a mod modulo) or None if there is no inverse
+
+# Examples
+
+```
+    let inverse = number_theory::euclidean_extension::inverse_mod(3, 11).unwrap();
+    assert_eq!(inverse, 4);
+```
+*/
+pub fn inverse_mod<T>(n: T, modulo: T) -> Option<T>
+where
+    T: Numeric,
+{
+    match solve_linear_congruence(n, FromPrimitive::from_usize(1).unwrap(), modulo) {
+        None => None,
+        Some(ret) => Some(ret[0]),
+    }
 }
