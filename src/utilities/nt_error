@@ -1,0 +1,4 @@
+enum nt_error {
+    No_solns,
+    Overflow,
+}

@@ -1,6 +1,10 @@
-pub mod euclidean_extension;
-pub mod numeric_trait;
+pub mod number_theory {
+    pub mod euclidean_extension;
+}
 
+pub mod utilities {
+    pub mod numeric_trait;
+}
 
 #[cfg(test)]
 mod tests;

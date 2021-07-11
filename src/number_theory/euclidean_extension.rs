@@ -1,4 +1,4 @@
-use crate::numeric_trait::Numeric;
+use crate::utilities::numeric_trait::Numeric;
 use num::{abs, FromPrimitive};
 
 struct ExtMatrix<T>
@@ -95,7 +95,7 @@ assert_eq!(lcm, 12);
 */
 pub fn lcm<T>(val1: T, val2: T) -> T
 where
-    T: Numeric
+    T: Numeric,
 {
     val1 * val2 / gcd(val1, val2)
 }
@@ -139,8 +139,8 @@ Returns a function which produces coefficients to solve ax + by = c if any exist
 
 # Returns
 * Option with a closure which takes an i32 and each different value produces different x, y
-  to solve the above equation.  The function provides a "small" pair for i = 0.  If there
-  is no solution then Option.None is returned.
+to solve the above equation.  The function provides a "small" pair for i = 0.  If there
+is no solution then Option.None is returned.
 
 # Examples
 
