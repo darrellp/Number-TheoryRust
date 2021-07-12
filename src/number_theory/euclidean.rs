@@ -15,8 +15,8 @@ where
     T: Numeric,
 {
     fn new(val1: T, val2: T) -> ExtMatrix<T> {
-        let zero: T = FromPrimitive::from_i32(0).unwrap();
-        let one: T = FromPrimitive::from_i32(1).unwrap();
+        let zero = T::zero();
+        let one = T::one();
 
         let mtx = [[val1, one, zero], [val2, zero, one], [zero, zero, zero]];
         ExtMatrix { first_row: 0, mtx }
@@ -33,7 +33,7 @@ where
     }
 
     fn finished(&self) -> bool {
-        self.mtx[(self.first_row + 1) % 3][0] == FromPrimitive::from_usize(0).unwrap()
+        self.mtx[(self.first_row + 1) % 3][0] == T::zero()
     }
 
     fn result(&self) -> (T, T, T) {
@@ -68,11 +68,10 @@ pub fn gcd<T>(val1: T, val2: T) -> T
 where
     T: Numeric,
 {
-    let zero: T = FromPrimitive::from_i32(0).unwrap();
     let mut val1 = abs(val1);
     let mut val2 = abs(val2);
 
-    while val2 != zero {
+    while val2 != T::zero() {
         let r = val1 % val2;
         val1 = val2;
         val2 = r;
@@ -187,9 +186,8 @@ pub fn solve_diophantine<T>(
 where
     T: Numeric,
 {
-    let zero = FromPrimitive::from_usize(0).unwrap();
     let (gcd, c1, c2) = calc_euclidean_ext(a, b);
-    if c % gcd != zero {
+    if c % gcd != T::zero() {
         return Err(nt_error::NtError::NoSolns);
     }
     let cnst1 = c * c1 / gcd;
@@ -247,9 +245,8 @@ pub fn solve_linear_congruence<T>(a: T, b: T, modulo: T) -> Result<Vec<T>, nt_er
 where
     T: Numeric,
 {
-    let zero = FromPrimitive::from_usize(0).unwrap();
-    let one = FromPrimitive::from_usize(1).unwrap();
-
+    let zero = T::zero();
+    let one = T::one();
     let (func_solns, gcd) = match solve_diophantine(a, modulo, b) {
         Err(e) => return Err(e),
         Ok(val) => val,
@@ -301,7 +298,7 @@ pub fn inverse_mod<T>(n: T, modulo: T) -> Result<T, nt_error::NtError>
 where
     T: Numeric,
 {
-    match solve_linear_congruence(n, FromPrimitive::from_usize(1).unwrap(), modulo) {
+    match solve_linear_congruence(n, T::one(), modulo) {
         Err(e) => Err(e),
         Ok(ret) => Ok(ret[0]),
     }
