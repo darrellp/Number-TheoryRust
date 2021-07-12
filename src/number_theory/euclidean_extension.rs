@@ -1,3 +1,4 @@
+use crate::utilities::nt_error;
 use crate::utilities::numeric_trait::Numeric;
 use num::{abs, FromPrimitive};
 
@@ -55,7 +56,12 @@ Returns a GCD of two numbers
 # Examples
 
 ```
-let gcd = number_theory::euclidean_extension::gcd(97, 18);
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
+
+let gcd = euclidean_extension::gcd(97, 18);
+//let gcd = crate::number_theory::euclidean_extension::gcd(97, 18);
 assert_eq!(gcd, 1);
 ```
 */
@@ -89,15 +95,24 @@ Returns a LCM of two numbers
 # Examples
 
 ```
-let lcm = number_theory::euclidean_extension::lcm(4, 6);
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
+
+let lcm = euclidean_extension::lcm(4, 6)
+    .unwrap_or_else(|_| panic!("Failed!"));
 assert_eq!(lcm, 12);
 ```
 */
-pub fn lcm<T>(val1: T, val2: T) -> T
+pub fn lcm<T>(val1: T, val2: T) -> Result<T, nt_error::NtError>
 where
     T: Numeric,
 {
-    val1 * val2 / gcd(val1, val2)
+    let opt = val1.checked_mul(&val2);
+    match opt {
+        None => Err(nt_error::NtError::Overflow),
+        Some(val) => Ok(val / gcd(val1, val2)),
+    }
 }
 
 /**
@@ -114,7 +129,11 @@ Returns a GCD of two numbers and the linear coefficients to produce that GCD fro
 # Examples
 
 ```
-let (gcd, coeff1, coeff2) = number_theory::euclidean_extension::calc_euclidean_ext(97, 18);
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
+
+let (gcd, coeff1, coeff2) = euclidean_extension::calc_euclidean_ext(97, 18);
 assert_eq!(gcd, 1);
 assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
 ```
@@ -145,26 +164,34 @@ is no solution then Option.None is returned.
 # Examples
 
 ```
-    let (opt, gcd) = number_theory::euclidean_extension::solve_diophantine(7, 13, 5);
-    assert_eq!(gcd, 1);
-    let fn_solve = opt.unwrap();
-    let (x, y) = fn_solve(0);
-    assert_eq!(7 * x + 13 * y, 5);
-    let (x1, y1) = fn_solve(1);
-    assert_ne!(x, x1);
-    assert_eq!(7*x1 + 13 * y1, 5);
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
+
+let (fn_solve, gcd) = euclidean_extension::solve_diophantine(7, 13, 5)
+    .unwrap_or_else(|_| panic!("Failed!"));
+assert_eq!(gcd, 1);
+let (x, y) = fn_solve(0);
+assert_eq!(7 * x + 13 * y, 5);
+let (x1, y1) = fn_solve(1);
+assert_ne!(x, x1);
+assert_eq!(7*x1 + 13 * y1, 5);
 
 
 ```
 */
-pub fn solve_diophantine<T>(a: T, b: T, c: T) -> (Option<impl Fn(i32) -> (T, T)>, T)
+pub fn solve_diophantine<T>(
+    a: T,
+    b: T,
+    c: T,
+) -> Result<(impl Fn(i32) -> (T, T), T), nt_error::NtError>
 where
     T: Numeric,
 {
     let zero = FromPrimitive::from_usize(0).unwrap();
     let (gcd, c1, c2) = calc_euclidean_ext(a, b);
     if c % gcd != zero {
-        return (None, gcd);
+        return Err(nt_error::NtError::NoSolns);
     }
     let cnst1 = c * c1 / gcd;
     let cnst2 = c * c2 / gcd;
@@ -185,7 +212,7 @@ where
         (cf1 * i_t + cnst1, cf2 * i_t + cnst2)
     };
 
-    (Some(result), gcd)
+    Ok((result, gcd))
 }
 
 /**
@@ -201,35 +228,40 @@ Returns solutions to ax = b (mod modulo)
 # Examples
 
 ```
-    let big_a = 123;
-    let big_b = 9123;
-    let big_mod = 321123;
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
 
-    let solns = number_theory::euclidean_extension::solve_linear_congruence(big_a, big_b, big_mod).unwrap();
-    assert_eq!(solns.len(), 3);
-    for isoln in solns {
-        assert_eq!(big_b, big_a * isoln % big_mod);
-    }
+let big_a = 123;
+let big_b = 9123;
+let big_mod = 321123;
+
+let solns = euclidean_extension::solve_linear_congruence(big_a, big_b, big_mod)
+    .unwrap_or_else(|_| panic!("failed"));
+assert_eq!(solns.len(), 3);
+for isoln in solns {
+    assert_eq!(big_b, big_a * isoln % big_mod);
+}
 ```
 */
-pub fn solve_linear_congruence<T>(a: T, b: T, modulo: T) -> Option<Vec<T>>
+pub fn solve_linear_congruence<T>(a: T, b: T, modulo: T) -> Result<Vec<T>, nt_error::NtError>
 where
     T: Numeric,
 {
     let zero = FromPrimitive::from_usize(0).unwrap();
     let one = FromPrimitive::from_usize(1).unwrap();
 
-    let (opt, gcd) = solve_diophantine(a, modulo, b);
-    let func_solns = match opt {
-        None => return None,
-        Some(val) => val,
+    let (func_solns, gcd) = match solve_diophantine(a, modulo, b) {
+        Err(e) => return Err(e),
+        Ok(val) => val,
     };
     let mut ret = Vec::new();
     let gcd_int_opt = num::ToPrimitive::to_i32(&gcd);
-    if gcd_int_opt == None {
-        return None;
-    }
-    let gcd_int = gcd_int_opt.unwrap();
+    let gcd_int = match gcd_int_opt {
+        None => return Err(nt_error::NtError::Overflow),
+        Some(val) => val,
+    };
+
     for i in 0..gcd_int {
         let (sln, _) = func_solns(i);
         let sln = if sln > modulo {
@@ -241,7 +273,7 @@ where
         };
         ret.push(sln);
     }
-    Some(ret)
+    Ok(ret)
 }
 
 /**
@@ -257,16 +289,21 @@ Returns a^-1 (mod modulo)
 # Examples
 
 ```
-    let inverse = number_theory::euclidean_extension::inverse_mod(3, 11).unwrap();
-    assert_eq!(inverse, 4);
+use number_theory::utilities::nt_error;
+use number_theory::utilities::numeric_trait::Numeric;
+use number_theory::number_theory::euclidean_extension;
+
+let inverse = euclidean_extension::inverse_mod(3, 11)
+    .unwrap_or_else(|_| panic!("Failed"));
+assert_eq!(inverse, 4);
 ```
 */
-pub fn inverse_mod<T>(n: T, modulo: T) -> Option<T>
+pub fn inverse_mod<T>(n: T, modulo: T) -> Result<T, nt_error::NtError>
 where
     T: Numeric,
 {
     match solve_linear_congruence(n, FromPrimitive::from_usize(1).unwrap(), modulo) {
-        None => None,
-        Some(ret) => Some(ret[0]),
+        Err(e) => Err(e),
+        Ok(ret) => Ok(ret[0]),
     }
 }

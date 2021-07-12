@@ -1,4 +1,4 @@
-use num::{FromPrimitive, Signed, ToPrimitive};
+use num::{CheckedMul, FromPrimitive, Signed, ToPrimitive};
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 pub trait Numeric:
@@ -15,6 +15,7 @@ pub trait Numeric:
     + PartialEq
     + FromPrimitive
     + ToPrimitive
+    + CheckedMul
 {
 }
 
@@ -32,5 +33,6 @@ impl<T> Numeric for T where
         + PartialEq
         + FromPrimitive
         + ToPrimitive
+        + CheckedMul
 {
 }
