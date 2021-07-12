@@ -58,10 +58,9 @@ Returns a GCD of two numbers
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
-let gcd = euclidean_extension::gcd(97, 18);
-//let gcd = crate::number_theory::euclidean_extension::gcd(97, 18);
+let gcd = euclidean::gcd(97, 18);
 assert_eq!(gcd, 1);
 ```
 */
@@ -97,9 +96,9 @@ Returns a LCM of two numbers
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
-let lcm = euclidean_extension::lcm(4, 6)
+let lcm = euclidean::lcm(4, 6)
     .unwrap_or_else(|_| panic!("Failed!"));
 assert_eq!(lcm, 12);
 ```
@@ -131,9 +130,9 @@ Returns a GCD of two numbers and the linear coefficients to produce that GCD fro
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
-let (gcd, coeff1, coeff2) = euclidean_extension::calc_euclidean_ext(97, 18);
+let (gcd, coeff1, coeff2) = euclidean::calc_euclidean_ext(97, 18);
 assert_eq!(gcd, 1);
 assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
 ```
@@ -166,9 +165,9 @@ is no solution then Option.None is returned.
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
-let (fn_solve, gcd) = euclidean_extension::solve_diophantine(7, 13, 5)
+let (fn_solve, gcd) = euclidean::solve_diophantine(7, 13, 5)
     .unwrap_or_else(|_| panic!("Failed!"));
 assert_eq!(gcd, 1);
 let (x, y) = fn_solve(0);
@@ -230,13 +229,13 @@ Returns solutions to ax = b (mod modulo)
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
 let big_a = 123;
 let big_b = 9123;
 let big_mod = 321123;
 
-let solns = euclidean_extension::solve_linear_congruence(big_a, big_b, big_mod)
+let solns = euclidean::solve_linear_congruence(big_a, big_b, big_mod)
     .unwrap_or_else(|_| panic!("failed"));
 assert_eq!(solns.len(), 3);
 for isoln in solns {
@@ -291,9 +290,9 @@ Returns a^-1 (mod modulo)
 ```
 use number_theory::utilities::nt_error;
 use number_theory::utilities::numeric_trait::Numeric;
-use number_theory::number_theory::euclidean_extension;
+use number_theory::number_theory::euclidean;
 
-let inverse = euclidean_extension::inverse_mod(3, 11)
+let inverse = euclidean::inverse_mod(3, 11)
     .unwrap_or_else(|_| panic!("Failed"));
 assert_eq!(inverse, 4);
 ```

@@ -1,5 +1,5 @@
 pub mod number_theory {
-    pub mod euclidean_extension;
+    pub mod euclidean;
 }
 
 pub mod utilities {
