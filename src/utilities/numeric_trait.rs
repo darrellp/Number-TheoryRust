@@ -1,5 +1,5 @@
 use num::{CheckedMul, FromPrimitive, Signed, ToPrimitive};
-use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
+use std::ops::{Add, AddAssign, BitAnd, Div, Mul, MulAssign, Neg, Rem, Shl, Shr, Sub};
 
 pub trait Numeric:
     Add<Output = Self>
@@ -16,6 +16,11 @@ pub trait Numeric:
     + FromPrimitive
     + ToPrimitive
     + CheckedMul
+    + Shl<usize, Output = Self>
+    + Shr<usize, Output = Self>
+    + BitAnd<Output = Self>
+    + MulAssign
+    + AddAssign
 {
 }
 
@@ -34,5 +39,10 @@ impl<T> Numeric for T where
         + FromPrimitive
         + ToPrimitive
         + CheckedMul
+        + Shl<usize, Output = T>
+        + Shr<usize, Output = T>
+        + BitAnd<Output = Self>
+        + MulAssign
+        + AddAssign
 {
 }

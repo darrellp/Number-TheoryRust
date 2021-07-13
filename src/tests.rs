@@ -1,7 +1,7 @@
 use crate::number_theory::euclidean::calc_euclidean_ext;
 use crate::number_theory::euclidean::solve_diophantine;
 use crate::number_theory::euclidean::solve_linear_congruence;
-//use crate::euclidean::solve_linear_congruence;
+use crate::number_theory::power_mod::power;
 //use num::BigInt;
 
 // Euclidean Extension
@@ -40,4 +40,10 @@ fn solve_linear_congruence_test() {
     for isoln in solns {
         assert_eq!(big_b, big_a * isoln % big_mod);
     }
+}
+
+#[test]
+fn power_test() {
+    let val = power(2357, 2357, 3599).unwrap_or_else(|_| panic!("Failed!"));
+    assert_eq!(3115_i64, val);
 }
