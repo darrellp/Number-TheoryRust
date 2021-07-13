@@ -2,18 +2,12 @@ use crate::utilities::nt_error;
 use crate::utilities::numeric_trait::Numeric;
 use num::{abs, FromPrimitive};
 
-struct ExtMatrix<T>
-where
-    T: Numeric,
-{
+struct ExtMatrix<T: Numeric> {
     first_row: usize,
     mtx: [[T; 3]; 3],
 }
 
-impl<T> ExtMatrix<T>
-where
-    T: Numeric,
-{
+impl<T: Numeric> ExtMatrix<T> {
     fn new(val1: T, val2: T) -> ExtMatrix<T> {
         let zero = T::zero();
         let one = T::one();
@@ -56,18 +50,13 @@ Returns a GCD of two numbers
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let gcd = euclidean::gcd(97, 18);
 assert_eq!(gcd, 1);
 ```
 */
-pub fn gcd<T>(val1: T, val2: T) -> T
-where
-    T: Numeric,
-{
+pub fn gcd<T: Numeric>(val1: T, val2: T) -> T {
     let mut val1 = abs(val1);
     let mut val2 = abs(val2);
 
@@ -93,8 +82,6 @@ Returns a LCM of two numbers
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let lcm = euclidean::lcm(4, 6)
@@ -102,10 +89,7 @@ let lcm = euclidean::lcm(4, 6)
 assert_eq!(lcm, 12);
 ```
 */
-pub fn lcm<T>(val1: T, val2: T) -> Result<T, nt_error::NtError>
-where
-    T: Numeric,
-{
+pub fn lcm<T: Numeric>(val1: T, val2: T) -> Result<T, nt_error::NtError> {
     let opt = val1.checked_mul(&val2);
     match opt {
         None => Err(nt_error::NtError::Overflow),
@@ -127,8 +111,6 @@ Returns a GCD of two numbers and the linear coefficients to produce that GCD fro
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let (gcd, coeff1, coeff2) = euclidean::calc_euclidean_ext(97, 18);
@@ -136,10 +118,7 @@ assert_eq!(gcd, 1);
 assert_eq!(coeff1 * 97 + coeff2 * 18, gcd);
 ```
 */
-pub fn calc_euclidean_ext<T>(val1: T, val2: T) -> (T, T, T)
-where
-    T: Numeric,
-{
+pub fn calc_euclidean_ext<T: Numeric>(val1: T, val2: T) -> (T, T, T) {
     let mut mtx = ExtMatrix::new(val1, val2);
     while !mtx.finished() {
         mtx.step();
@@ -162,8 +141,6 @@ is no solution then Option.None is returned.
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let (fn_solve, gcd) = euclidean::solve_diophantine(7, 13, 5)
@@ -178,14 +155,11 @@ assert_eq!(7*x1 + 13 * y1, 5);
 
 ```
 */
-pub fn solve_diophantine<T>(
+pub fn solve_diophantine<T: Numeric>(
     a: T,
     b: T,
     c: T,
-) -> Result<(impl Fn(i32) -> (T, T), T), nt_error::NtError>
-where
-    T: Numeric,
-{
+) -> Result<(impl Fn(i32) -> (T, T), T), nt_error::NtError> {
     let (gcd, c1, c2) = calc_euclidean_ext(a, b);
     if c % gcd != T::zero() {
         return Err(nt_error::NtError::NoSolns);
@@ -225,8 +199,6 @@ Returns solutions to ax = b (mod modulo)
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let big_a = 123;
@@ -241,10 +213,11 @@ for isoln in solns {
 }
 ```
 */
-pub fn solve_linear_congruence<T>(a: T, b: T, modulo: T) -> Result<Vec<T>, nt_error::NtError>
-where
-    T: Numeric,
-{
+pub fn solve_linear_congruence<T: Numeric>(
+    a: T,
+    b: T,
+    modulo: T,
+) -> Result<Vec<T>, nt_error::NtError> {
     let zero = T::zero();
     let one = T::one();
     let (func_solns, gcd) = match solve_diophantine(a, modulo, b) {
@@ -285,8 +258,6 @@ Returns a^-1 (mod modulo)
 # Examples
 
 ```
-use number_theory::utilities::nt_error;
-use number_theory::utilities::numeric_trait::Numeric;
 use number_theory::number_theory::euclidean;
 
 let inverse = euclidean::inverse_mod(3, 11)
@@ -294,10 +265,7 @@ let inverse = euclidean::inverse_mod(3, 11)
 assert_eq!(inverse, 4);
 ```
 */
-pub fn inverse_mod<T>(n: T, modulo: T) -> Result<T, nt_error::NtError>
-where
-    T: Numeric,
-{
+pub fn inverse_mod<T: Numeric>(n: T, modulo: T) -> Result<T, nt_error::NtError> {
     match solve_linear_congruence(n, T::one(), modulo) {
         Err(e) => Err(e),
         Ok(ret) => Ok(ret[0]),
