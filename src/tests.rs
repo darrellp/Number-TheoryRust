@@ -2,7 +2,6 @@ use crate::number_theory::euclidean::calc_euclidean_ext;
 use crate::number_theory::euclidean::solve_diophantine;
 use crate::number_theory::euclidean::solve_linear_congruence;
 use crate::number_theory::power_mod::power;
-//use num::BigInt;
 
 // Euclidean Extension
 #[test]
@@ -27,12 +26,12 @@ fn solve_diophantine_test() {
 
 #[test]
 fn solve_linear_congruence_test() {
-    // let big_a = BigInt::parse_bytes(b"6123123", 10).unwrap();
-    // let big_b = BigInt::parse_bytes(b"6123123123", 10).unwrap();
-    // let big_mod = BigInt::parse_bytes(b"9123123123123", 10).unwrap();
     let big_a: i128 = 6123123;
     let big_b: i128 = 6123123123;
     let big_mod: i128 = 9123123123123;
+    // let big_a = apint::Int::from_i128(6123123i128);
+    // let big_b = apint::Int::from_i128(6123123123);
+    // let big_mod = apint::Int::from_i128(9123123123123);
 
     let solns =
         solve_linear_congruence(big_a, big_b, big_mod).unwrap_or_else(|_| panic!("Failed!"));
